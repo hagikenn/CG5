@@ -3,7 +3,7 @@
 #include <cassert>       // assert
 #include "MiscUtility.h"
 #include <dxcapi.h>
-#pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxcompiler.lib")
 
 
 void Shader::Load(const std::wstring& filePath, const std::wstring& shaderModel) {
