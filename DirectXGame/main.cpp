@@ -103,16 +103,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	//頂点データの準備★00_07追加
 	VertexData vertices[] = {
-	    {0.0f,  0.5f,  0.0f, 1.0f}, //  上
-	    {0.5f,  -0.5f, 0.0f, 1.0f}, //  右下
-	    {-0.5f, -0.5f, 0.0f, 1.0f}, //  左下
+	    {1.0f,  1.0f,  0.0f, 1.0f}, //  右上0
+	    {-1.0f,  1.0f,  0.0f, 1.0f},//左上1
+	    {1.0f,  -1.0f, 0.0f, 1.0f}, //  右下2
+	    {-1.0f, -1.0f, 0.0f, 1.0f}, //  左下3
 	};
 
 	// 頂点インデックスデータの準備------★00_07追加
 	uint16_t indices[] = {
-	    0,
-	    1,
-	    2,
+	    0,2,3,
+		1,0,3,
 	};
 
 	// IndexBuffer(IndexResource, IndexResourceView)の生成
