@@ -73,6 +73,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// DirectXCommonクラスが管理している、コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon->GetCommandList();
 
+
+
 	// RootSignature作成 -------------------------------------------
 	RootSignature rs;
 	rs.Create();
@@ -91,6 +93,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	PipelineState PipelineState;
 	SetupPipelineState(PipelineState, rs, vs, ps);
 	
+
+
 	//リソースの確保含め、頂点情報を柔軟に対応できるようにVertexData構造体を新たに作成する
 	//Vector4⇒VectorDataに変更して利用する
 	struct VertexData {
@@ -104,13 +108,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	    {-0.5f, -0.5f, 0.0f, 1.0f}, //  左下
 	};
 
-	//VertexBuffer(VertexResource,VertexResourceView)の生成
-	VertexBuffer vb;
-	vb.Create(sizeof(vertices) * 3, sizeof(vertices[0]));//★00_07変更
-
-	//頂点インデックスデータの準備------★00_07追加
+	// 頂点インデックスデータの準備------★00_07追加
 	uint16_t indices[] = {
-	    0,1,2,
+	    0,
+	    1,
+	    2,
 	};
 
 	// IndexBuffer(IndexResource, IndexResourceView)の生成
@@ -124,6 +126,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	for (int i = 0; i < _countof(indices); ++i) {
 		pGpuIndices[i] = indices[i];
 	}
+
+	//VertexBuffer(VertexResource,VertexResourceView)の生成
+	VertexBuffer vb;
+	vb.Create(sizeof(vertices) * 3, sizeof(vertices[0]));//★00_07変更
+
+	
 
 	// 頂点リソースにデータを書き込む---------★00_07追加
 	VertexData* pGpuVertices = nullptr;
@@ -156,7 +164,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// 頂点数、インスタンス数、頂点の開始位置、インスタンスのオフセット
-		commandList->DrawInstanced(_countof(indices),1,0,0);
+		commandList->DrawIndexedInstanced(_countof(indices),1,0,0,0);
 
 		//描画終了
 		dxCommon->PostDraw();
