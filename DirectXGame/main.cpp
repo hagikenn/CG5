@@ -8,59 +8,6 @@
 #include"IndexBuffer.h"
 using namespace KamataEngine;
 
-void SetupPipelineState(PipelineState& pipelineState, RootSignature& rs, Shader& vs, Shader& ps) {
-	// InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
-	inputElementDescs[0].SemanticName = "POSITION";
-	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	inputElementDescs[1].SemanticName = "TEXCOORD";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-	// BlendState --------------- 今回は不透明
-	D3D12_BLEND_DESC blendDesc{};
-	// すべての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-	// RasterizerState ------------------
-	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	// 裏面(反時計回り)をカリングする
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	// 塗りつぶしモードをソリッドにする(ワイヤーフレームなら　D3D12_FIll_MODE_WIREFRAME)
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-		// PSO(PipelineStateObject)の生成
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rs.Get();                                                    // RootSignature
-	graphicsPipelineStateDesc.InputLayout= inputLayoutDesc;                                                // InputLayout
-	graphicsPipelineStateDesc.VS = {vs.GetDxcBlob()->GetBufferPointer(), vs.GetDxcBlob()->GetBufferSize()}; // VertexShader
-	graphicsPipelineStateDesc.PS = {ps.GetDxcBlob()->GetBufferPointer(), ps.GetDxcBlob()->GetBufferSize()}; // PixelShader
-	graphicsPipelineStateDesc.BlendState = blendDesc;                                                       // BlendState
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                             // RasterizerState
-
-	// 書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 1; // 1つのRTVに書き込む ※2つ同時に行うと思えばできる
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-	// 利用するトポロジ(形状)のタイプ。三角形
-	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-	// どのように画面に色を打ち込むかの設定(今は気にしなくていい)
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-
-	// 準備は整った。PSOを生成する
-	pipelineState.Create(graphicsPipelineStateDesc);
-};
-
 // 関数プロトタイプ宣言 ========================================================
 // PipelineStateObjectの生成
 void SetupPipelineState(PipelineState& pipelineState, RootSignature& rs, Shader& vs, Shader& ps);
@@ -421,3 +368,56 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	
 	return 0;
 }
+
+void SetupPipelineState(PipelineState& pipelineState, RootSignature& rs, Shader& vs, Shader& ps) {
+	// InputLayout
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+	inputElementDescs[0].SemanticName = "POSITION";
+	inputElementDescs[0].SemanticIndex = 0;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[1].SemanticName = "TEXCOORD";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+	inputLayoutDesc.pInputElementDescs = inputElementDescs;
+	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+
+	// BlendState --------------- 今回は不透明
+	D3D12_BLEND_DESC blendDesc{};
+	// すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	// RasterizerState ------------------
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
+	// 裏面(反時計回り)をカリングする
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	// 塗りつぶしモードをソリッドにする(ワイヤーフレームなら　D3D12_FIll_MODE_WIREFRAME)
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+	// PSO(PipelineStateObject)の生成
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+	graphicsPipelineStateDesc.pRootSignature = rs.Get();                                                    // RootSignature
+	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;                                                // InputLayout
+	graphicsPipelineStateDesc.VS = {vs.GetDxcBlob()->GetBufferPointer(), vs.GetDxcBlob()->GetBufferSize()}; // VertexShader
+	graphicsPipelineStateDesc.PS = {ps.GetDxcBlob()->GetBufferPointer(), ps.GetDxcBlob()->GetBufferSize()}; // PixelShader
+	graphicsPipelineStateDesc.BlendState = blendDesc;                                                       // BlendState
+	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;                                             // RasterizerState
+
+	// 書き込むRTVの情報
+	graphicsPipelineStateDesc.NumRenderTargets = 1; // 1つのRTVに書き込む ※2つ同時に行うと思えばできる
+	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+	// 利用するトポロジ(形状)のタイプ。三角形
+	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+	// どのように画面に色を打ち込むかの設定(今は気にしなくていい)
+	graphicsPipelineStateDesc.SampleDesc.Count = 1;
+	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	// 準備は整った。PSOを生成する
+	pipelineState.Create(graphicsPipelineStateDesc);
+};
