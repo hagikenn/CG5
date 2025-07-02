@@ -339,10 +339,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 
 		
-
-		//描画開始
-		dxCommon->PreDraw();
-
 		// TransitionBarrierを SRV ⇒ RTV に設定する
 		D3D12_RESOURCE_BARRIER barrier{};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;                       // TranslationBarrierの設定
@@ -381,6 +377,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// 指定した深度で画面全体をクリアする
 		commandList->ClearDepthStencilView(dsvHandleCPU, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
+		// TransitionBarrierを元に戻し、PixelShaderが扱えるようにする
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;                      // TranslationBarrierの設定
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;                           // フラグは None にしておく
+		barrier.Transition.pResource = renderTextureResource;                       // バリアを張る対象のリソース
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;        // 遷移前
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE; // 遷移後
+		commandList->ResourceBarrier(1, &barrier);                                  // バリアを張る
+
+		// 描画開始
+		dxCommon->PreDraw();
 
 		// コマンドを積む
 		commandList->SetGraphicsRootSignature(rs.Get());// RootSignatureの設定
@@ -398,15 +404,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// 頂点数、インスタンス数、頂点の開始位置、インスタンスのオフセット
 		commandList->DrawIndexedInstanced(_countof(indices),1,0,0,0);
-
-		// TransitionBarrierを元に戻し、PixelShaderが扱えるようにする
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;                      // TranslationBarrierの設定
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;                           // フラグは None にしておく
-		barrier.Transition.pResource = renderTextureResource;                       // バリアを張る対象のリソース
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;        // 遷移前
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE; // 遷移後
-		commandList->ResourceBarrier(1, &barrier);                                  // バリアを張る
-
 
 		//描画終了
 		dxCommon->PostDraw();
