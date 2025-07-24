@@ -9,8 +9,10 @@ void PipelineState::Create(D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineSt
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
-	HRESULT hr = dxCommon->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
-	assert(SUCCEEDED(hr));
+	dxCommon->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	#ifdef _DEBUG
+		assert(SUCCEEDED(hr));
+	#endif
 
 	// 生成した PipelineState をとっておく
 	pipelineState_ = graphicsPipelineState;
